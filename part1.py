@@ -19,11 +19,11 @@ def F_default(x: float) -> float:
     return 2 * x ** 4 - 8 * x ** 3 - 16 * x ** 2 - 1
 
 
-def dF(x: float) -> float:
+def numerical_derivative(F, h=1e-5):
     """
-    Похідна функції F(x).
+    Повертає функцію, яка обчислює похідну F(x) чисельно.
     """
-    return 8 * x ** 3 - 24 * x ** 2 - 32 * x
+    return lambda x: (F(x + h) - F(x - h)) / (2 * h)
 
 
 def newtons_method(a, b, e, F, dF):
@@ -62,18 +62,20 @@ def main() -> None:
     Головна функція програми: отримує вхідні дані, обчислює результати, виводить таблицю та будує графік.
     """
     print("\nSolving a nonlinear equation using Newton's method")
-    print("Default function: F(x) = 2 * x^4 - 8 * x^3 - 16 * x^2 - 1")
+    print("Default function: F(x) = 2 * x ** 4 - 8 * x ** 3 - 16 * x ** 2 - 1")
 
     use_default = input("Do you want to continue with this function? (yes/no): ").strip().lower()
 
     if use_default == "yes":
         F = F_default
+        dF = numerical_derivative(F)
     else:
         F = get_function()
+        dF = numerical_derivative(F)
 
-    a = float(input("Enter the interval [a; b]:\na (for 18 it`s -2) = "))  # Ask for a
-    b = float(input("b (for 18 it`s 6) = "))  # Ask for b
-    e = float(input("Enter the error tolerance e (0.0001) = "))  # Error tolerance
+    a = float(input("Enter the interval [a; b]:\na (for 18 it`s -2) = "))
+    b = float(input("b (for 18 it`s 6) = "))
+    e = float(input("Enter the error tolerance e (0.0001) = "))
 
     # Find roots and intermediate values
     roots, table_data = newtons_method(a, b, e, F, dF)
@@ -89,7 +91,6 @@ def main() -> None:
     intermediate_table = pd.DataFrame(table_data, columns=columns)
     print(intermediate_table.to_string(index=False))
 
-    # Plot function and roots
     x_vals = np.linspace(a - 1, b + 1, 400)
     y_vals = F(x_vals)
 
